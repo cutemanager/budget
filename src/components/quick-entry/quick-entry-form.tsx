@@ -49,6 +49,8 @@ export function QuickEntryForm({
   }));
 
   const visibleCategories = categories.filter((category) => category.type === form.type);
+  const hasVisibleCategories = visibleCategories.length > 0;
+  const canSubmit = Boolean(form.amount.trim()) && Boolean(form.categoryId);
 
   useEffect(() => {
     const exists = visibleCategories.some((category) => category.id === form.categoryId);
@@ -70,6 +72,12 @@ export function QuickEntryForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!canSubmit) {
+      setError("먼저 금액과 카테고리를 확인해 주세요.");
+      return;
+    }
+
     setMessage("");
     setError("");
     setIsSubmitting(true);
@@ -89,11 +97,11 @@ export function QuickEntryForm({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error ?? "거래내역을 저장하지 못했습니다.");
+        setError(result.error ?? "거래 내역을 저장하지 못했습니다.");
         return;
       }
 
-      setMessage("저장되었습니다. 바로 다음 입력을 이어갈 수 있어요.");
+      setMessage("저장되었습니다. 이어서 다음 내역도 빠르게 입력할 수 있어요.");
       setForm((current) => ({
         ...current,
         amount: "",
@@ -113,7 +121,7 @@ export function QuickEntryForm({
     <section className="rounded-4xl border border-white/70 bg-white/80 p-5 shadow-soft">
       <div className="space-y-1">
         <h2 className="text-xl font-black text-ink">빠른 입력</h2>
-        <p className="text-sm text-ink/65">숫자를 먼저 넣고 바로 저장할 수 있게 입력 흐름을 짧게 설계했습니다.</p>
+        <p className="text-sm text-ink/65">숫자를 먼저 적고 바로 저장할 수 있게 입력 흐름을 단순하게 구성했습니다.</p>
       </div>
 
       <form className="mt-5 space-y-5" onSubmit={handleSubmit}>
@@ -148,33 +156,45 @@ export function QuickEntryForm({
 
         <div className="space-y-2">
           <span className="text-sm font-medium text-ink">카테고리</span>
-          <div className="flex flex-wrap gap-2">
-            {visibleCategories.map((category) => (
-              <button
-                className={`rounded-full border px-3 py-2 text-sm font-semibold transition ${
-                  form.categoryId === category.id
-                    ? "border-transparent bg-ink text-paper"
-                    : "border-black/10 bg-white text-ink/75 hover:border-accent"
-                }`}
-                key={category.id}
-                onClick={() => updateField("categoryId", category.id)}
-                type="button"
+
+          {hasVisibleCategories ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {visibleCategories.map((category) => (
+                  <button
+                    className={`rounded-full border px-3 py-2 text-sm font-semibold transition ${
+                      form.categoryId === category.id
+                        ? "border-transparent bg-ink text-paper"
+                        : "border-black/10 bg-white text-ink/75 hover:border-accent"
+                    }`}
+                    key={category.id}
+                    onClick={() => updateField("categoryId", category.id)}
+                    type="button"
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+
+              <select
+                className="w-full rounded-2xl border border-black/10 bg-paper px-4 py-3 text-sm outline-none focus:border-accent"
+                onChange={(event) => updateField("categoryId", event.target.value)}
+                value={form.categoryId}
               >
-                {category.name}
-              </button>
-            ))}
-          </div>
-          <select
-            className="w-full rounded-2xl border border-black/10 bg-paper px-4 py-3 text-sm outline-none focus:border-accent"
-            onChange={(event) => updateField("categoryId", event.target.value)}
-            value={form.categoryId}
-          >
-            {visibleCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+                {visibleCategories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </>
+          ) : (
+            <div className="rounded-3xl border border-dashed border-black/10 bg-sand/50 px-4 py-4 text-sm leading-6 text-ink/70">
+              {form.type === "expense"
+                ? "지출 카테고리가 아직 없습니다. 오른쪽에서 카테고리를 추가하거나 샘플 데이터를 반영해 주세요."
+                : "수입 카테고리가 아직 없습니다. 오른쪽에서 카테고리를 추가하거나 샘플 데이터를 반영해 주세요."}
+            </div>
+          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -189,7 +209,7 @@ export function QuickEntryForm({
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-medium text-ink">결제수단</span>
+            <span className="text-sm font-medium text-ink">결제 수단</span>
             <select
               className="w-full rounded-2xl border border-black/10 bg-paper px-4 py-3 outline-none focus:border-accent"
               onChange={(event) => updateField("paymentMethod", event.target.value as PaymentMethod)}
@@ -208,7 +228,7 @@ export function QuickEntryForm({
           <input
             className="w-full rounded-2xl border border-black/10 bg-paper px-4 py-3 outline-none focus:border-accent"
             onChange={(event) => updateField("memo", event.target.value)}
-            placeholder="예: 점심, 월세, 프리랜서 작업"
+            placeholder="예: 점심, 교통카드 충전, 커피"
             value={form.memo}
           />
         </label>
@@ -218,7 +238,7 @@ export function QuickEntryForm({
 
         <button
           className="w-full rounded-3xl bg-ink px-5 py-4 text-sm font-semibold text-paper transition hover:bg-clay disabled:opacity-60"
-          disabled={isPending || isSubmitting}
+          disabled={isPending || isSubmitting || !canSubmit}
           type="submit"
         >
           저장하고 계속 입력

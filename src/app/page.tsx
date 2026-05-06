@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { MonthFilterForm } from "@/components/common/month-filter-form";
+import { SampleDataSeeder } from "@/components/common/sample-data-seeder";
 import { SupabaseConfigNotice } from "@/components/common/supabase-config-notice";
 import { BudgetAlertList } from "@/components/dashboard/budget-alert-list";
 import { DailyExpenseChart } from "@/components/dashboard/daily-expense-chart";
@@ -21,7 +22,7 @@ type PageProps = {
 
 export default async function DashboardPage({ searchParams }: PageProps) {
   if (!isSupabaseConfigured()) {
-    return <SupabaseConfigNotice title="Supabase 연결이 필요합니다" />;
+    return <SupabaseConfigNotice title="Supabase 연결이 필요합니다." />;
   }
 
   const month = await resolveMonth(getSearchParamValue(searchParams?.month));
@@ -31,7 +32,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     <div className="space-y-5">
       <MonthFilterForm
         action="/"
-        description="월별 수입, 지출, 예산 경고를 한눈에 보는 대시보드입니다."
+        description="월별 수입, 지출, 예산 경고를 한 화면에서 빠르게 확인할 수 있습니다."
         month={month}
         title={formatMonthLabel(month)}
       />
@@ -41,6 +42,13 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         totalExpense={summary.totalExpense}
         totalIncome={summary.totalIncome}
       />
+
+      {summary.recentTransactions.length === 0 ? (
+        <SampleDataSeeder
+          description="대시보드가 비어 있다면 기본 카테고리와 이번 달 샘플 거래/예산을 한 번에 채워 바로 테스트할 수 있습니다."
+          title="처음 테스트하신다면"
+        />
+      ) : null}
 
       <section className="grid gap-5 lg:grid-cols-[1.3fr_0.9fr]">
         <ExpensePieChart data={summary.categoryBreakdown} />
@@ -82,7 +90,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         <article className="rounded-4xl border border-white/70 bg-white/80 p-5 shadow-soft">
           <div className="space-y-2">
             <h2 className="text-xl font-black text-ink">빠른 이동</h2>
-            <p className="text-sm text-ink/65">지금 바로 기록을 남기거나 예산을 다듬을 수 있습니다.</p>
+            <p className="text-sm text-ink/65">지금 바로 기록을 추가하거나 예산을 조정할 수 있습니다.</p>
           </div>
 
           <div className="mt-4 grid gap-3">
@@ -90,7 +98,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               className="rounded-3xl bg-ink px-4 py-4 text-sm font-semibold text-paper transition hover:bg-clay"
               href="/quick-entry"
             >
-              거래내역 빠르게 입력하기
+              거래 내역 빠르게 입력하기
             </Link>
             <Link
               className="rounded-3xl border border-black/10 bg-white px-4 py-4 text-sm font-semibold text-ink transition hover:border-accent"
@@ -102,7 +110,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
               className="rounded-3xl border border-black/10 bg-white px-4 py-4 text-sm font-semibold text-ink transition hover:border-accent"
               href={`/budgets?month=${month}`}
             >
-              예산 관리 열기
+              예산 관리하기
             </Link>
           </div>
         </article>

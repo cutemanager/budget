@@ -35,13 +35,13 @@ export async function POST(request: Request) {
     }
 
     if (category.type !== parsed.type) {
-      return NextResponse.json({ error: "수입/지출 타입과 카테고리가 맞지 않습니다." }, { status: 400 });
+      return NextResponse.json({ error: "거래 구분과 카테고리 타입이 맞지 않습니다." }, { status: 400 });
     }
 
     const transaction = await createTransaction(parsed);
     return NextResponse.json(transaction, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "거래내역을 저장하지 못했습니다.";
+    const message = error instanceof Error ? error.message : "거래 내역을 저장하지 못했습니다.";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

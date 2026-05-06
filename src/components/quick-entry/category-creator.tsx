@@ -45,6 +45,7 @@ export function CategoryCreator() {
 
       setName("");
       setMessage("카테고리를 추가했습니다.");
+
       startTransition(() => {
         router.refresh();
       });
@@ -57,7 +58,7 @@ export function CategoryCreator() {
     <section className="rounded-4xl border border-white/70 bg-white/80 p-5 shadow-soft">
       <div className="space-y-1">
         <h3 className="text-lg font-bold text-ink">카테고리 추가</h3>
-        <p className="text-sm text-ink/65">자주 쓰는 카테고리를 바로 추가해서 입력 흐름을 끊지 않게 만듭니다.</p>
+        <p className="text-sm text-ink/65">자주 쓰는 항목을 바로 추가해서 입력 흐름을 더 빠르게 만들 수 있습니다.</p>
       </div>
 
       <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
@@ -79,7 +80,7 @@ export function CategoryCreator() {
             <input
               className="w-full rounded-2xl border border-black/10 bg-paper px-4 py-3 outline-none focus:border-accent"
               onChange={(event) => setName(event.target.value)}
-              placeholder="예: 반려동물"
+              placeholder="예: 반려동물, 교육, 보너스"
               value={name}
             />
           </label>

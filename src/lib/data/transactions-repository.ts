@@ -52,7 +52,7 @@ export async function listTransactions(filters: TransactionFilters = {}) {
   const { data, error } = await query;
 
   if (error) {
-    throw new Error(`거래내역을 불러오지 못했습니다: ${error.message}`);
+    throw new Error(`거래 내역을 불러오지 못했습니다. ${error.message}`);
   }
 
   return (data ?? []).map(mapTransactionRow).sort(sortTransactions);
@@ -97,7 +97,7 @@ export async function createTransaction(input: Omit<Transaction, "id" | "created
     .single();
 
   if (error) {
-    throw new Error(`거래내역을 저장하지 못했습니다: ${error.message}`);
+    throw new Error(`거래 내역을 저장하지 못했습니다. ${error.message}`);
   }
 
   const settings = await getSettings();
@@ -126,11 +126,11 @@ export async function updateTransaction(id: string, patch: Partial<Omit<Transact
     .maybeSingle();
 
   if (error) {
-    throw new Error(`거래내역을 수정하지 못했습니다: ${error.message}`);
+    throw new Error(`거래 내역을 수정하지 못했습니다. ${error.message}`);
   }
 
   if (!data) {
-    throw new Error("거래내역을 찾을 수 없습니다.");
+    throw new Error("거래 내역을 찾을 수 없습니다.");
   }
 
   return mapTransactionRow(data);
@@ -141,11 +141,11 @@ export async function deleteTransaction(id: string) {
   const { error, count } = await supabase.from("transactions").delete({ count: "exact" }).eq("id", id);
 
   if (error) {
-    throw new Error(`거래내역을 삭제하지 못했습니다: ${error.message}`);
+    throw new Error(`거래 내역을 삭제하지 못했습니다. ${error.message}`);
   }
 
   if (!count) {
-    throw new Error("거래내역을 찾을 수 없습니다.");
+    throw new Error("거래 내역을 찾을 수 없습니다.");
   }
 }
 
@@ -160,7 +160,7 @@ export async function getDefaultMonth() {
     .maybeSingle();
 
   if (error) {
-    throw new Error(`기본 월 정보를 계산하지 못했습니다: ${error.message}`);
+    throw new Error(`기본 월 정보를 계산하지 못했습니다. ${error.message}`);
   }
 
   if (data && isMonthString(data.transaction_date.slice(0, 7))) {

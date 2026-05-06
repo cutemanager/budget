@@ -10,14 +10,10 @@ const fallback: Settings = {
 
 export async function getSettings() {
   const supabase = createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("app_settings")
-    .select("*")
-    .eq("id", "global")
-    .maybeSingle();
+  const { data, error } = await supabase.from("app_settings").select("*").eq("id", "global").maybeSingle();
 
   if (error) {
-    throw new Error(`설정 정보를 불러오지 못했습니다: ${error.message}`);
+    throw new Error(`설정 정보를 불러오지 못했습니다. ${error.message}`);
   }
 
   if (data) {
@@ -36,7 +32,7 @@ export async function getSettings() {
     .single();
 
   if (insertError) {
-    throw new Error(`기본 설정을 만들지 못했습니다: ${insertError.message}`);
+    throw new Error(`기본 설정을 만들지 못했습니다. ${insertError.message}`);
   }
 
   return mapSettingsRow(inserted);
@@ -60,7 +56,7 @@ export async function updateSettings(patch: Partial<Settings>) {
     .single();
 
   if (error) {
-    throw new Error(`설정 정보를 저장하지 못했습니다: ${error.message}`);
+    throw new Error(`설정 정보를 저장하지 못했습니다. ${error.message}`);
   }
 
   return mapSettingsRow(data);
