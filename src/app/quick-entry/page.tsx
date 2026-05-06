@@ -1,12 +1,18 @@
+import { SupabaseConfigNotice } from "@/components/common/supabase-config-notice";
 import { CategoryCreator } from "@/components/quick-entry/category-creator";
 import { QuickEntryForm } from "@/components/quick-entry/quick-entry-form";
 import { getCategories } from "@/lib/data/categories-repository";
 import { getSettings } from "@/lib/data/settings-repository";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getTodayValue } from "@/lib/utils/date";
 
 export const dynamic = "force-dynamic";
 
 export default async function QuickEntryPage() {
+  if (!isSupabaseConfigured()) {
+    return <SupabaseConfigNotice title="Supabase 연결이 필요합니다" />;
+  }
+
   const [categories, settings] = await Promise.all([getCategories(), getSettings()]);
 
   return (

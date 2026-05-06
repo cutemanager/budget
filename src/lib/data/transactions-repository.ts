@@ -1,11 +1,11 @@
 import { getCategoryMap } from "@/lib/data/categories-repository";
-import { dataFiles, generateId, readJsonFile, writeJsonFile } from "@/lib/data/file-db";
+import { mapTransactionRow } from "@/lib/data/supabase-mappers";
 import { getSettings, updateSettings } from "@/lib/data/settings-repository";
-import { getCurrentMonth, isMonthString } from "@/lib/utils/date";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getCurrentMonth, getMonthDateRange, isMonthString } from "@/lib/utils/date";
+import { generateId } from "@/lib/utils/id";
 import type { CategoryType } from "@/types/category";
 import type { EnrichedTransaction, Transaction } from "@/types/transaction";
-
-const fallback: Transaction[] = [];
 
 type TransactionFilters = {
   month?: string;
@@ -25,31 +25,37 @@ function sortTransactions(a: Transaction, b: Transaction) {
 }
 
 export async function listTransactions(filters: TransactionFilters = {}) {
-  const transactions = await readJsonFile<Transaction[]>(dataFiles.transactions, fallback);
+  const supabase = createSupabaseServerClient();
+  let query = supabase
+    .from("transactions")
+    .select("*")
+    .order("transaction_date", { ascending: false })
+    .order("created_at", { ascending: false });
 
-  return transactions
-    .filter((transaction) => {
-      if (filters.month && transaction.transactionDate.slice(0, 7) !== filters.month) {
-        return false;
-      }
+  if (filters.month) {
+    const { start, endExclusive } = getMonthDateRange(filters.month);
+    query = query.gte("transaction_date", start).lt("transaction_date", endExclusive);
+  }
 
-      if (filters.categoryId && transaction.categoryId !== filters.categoryId) {
-        return false;
-      }
+  if (filters.categoryId) {
+    query = query.eq("category_id", filters.categoryId);
+  }
 
-      if (filters.type && transaction.type !== filters.type) {
-        return false;
-      }
+  if (filters.type) {
+    query = query.eq("type", filters.type);
+  }
 
-      if (filters.q) {
-        const query = filters.q.trim().toLowerCase();
-        const memo = transaction.memo.toLowerCase();
-        return memo.includes(query);
-      }
+  if (filters.q?.trim()) {
+    query = query.ilike("memo", `%${filters.q.trim()}%`);
+  }
 
-      return true;
-    })
-    .sort(sortTransactions);
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(`거래내역을 불러오지 못했습니다: ${error.message}`);
+  }
+
+  return (data ?? []).map(mapTransactionRow).sort(sortTransactions);
 }
 
 export async function listEnrichedTransactions(filters: TransactionFilters = {}) {
@@ -67,7 +73,7 @@ export async function listEnrichedTransactions(filters: TransactionFilters = {})
 }
 
 export async function createTransaction(input: Omit<Transaction, "id" | "createdAt">) {
-  const transactions = await listTransactions();
+  const supabase = createSupabaseServerClient();
   const nextTransaction: Transaction = {
     ...input,
     id: generateId("txn"),
@@ -75,8 +81,24 @@ export async function createTransaction(input: Omit<Transaction, "id" | "created
     memo: input.memo.trim()
   };
 
-  const nextTransactions = [...transactions, nextTransaction].sort(sortTransactions);
-  await writeJsonFile(dataFiles.transactions, nextTransactions);
+  const { data, error } = await supabase
+    .from("transactions")
+    .insert({
+      id: nextTransaction.id,
+      type: nextTransaction.type,
+      amount: nextTransaction.amount,
+      category_id: nextTransaction.categoryId,
+      payment_method: nextTransaction.paymentMethod,
+      memo: nextTransaction.memo,
+      transaction_date: nextTransaction.transactionDate,
+      created_at: nextTransaction.createdAt
+    })
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(`거래내역을 저장하지 못했습니다: ${error.message}`);
+  }
 
   const settings = await getSettings();
   await updateSettings({
@@ -84,49 +106,65 @@ export async function createTransaction(input: Omit<Transaction, "id" | "created
     lastUsedCategoryId: input.categoryId ?? settings.lastUsedCategoryId
   });
 
-  return nextTransaction;
+  return mapTransactionRow(data);
 }
 
 export async function updateTransaction(id: string, patch: Partial<Omit<Transaction, "id" | "createdAt">>) {
-  const transactions = await listTransactions();
-  const index = transactions.findIndex((transaction) => transaction.id === id);
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .update({
+      type: patch.type,
+      amount: patch.amount,
+      category_id: patch.categoryId,
+      payment_method: patch.paymentMethod,
+      memo: patch.memo?.trim(),
+      transaction_date: patch.transactionDate
+    })
+    .eq("id", id)
+    .select("*")
+    .maybeSingle();
 
-  if (index === -1) {
+  if (error) {
+    throw new Error(`거래내역을 수정하지 못했습니다: ${error.message}`);
+  }
+
+  if (!data) {
     throw new Error("거래내역을 찾을 수 없습니다.");
   }
 
-  const current = transactions[index];
-  const nextTransaction: Transaction = {
-    ...current,
-    ...patch,
-    memo: patch.memo?.trim() ?? current.memo
-  };
-
-  const nextTransactions = [...transactions];
-  nextTransactions[index] = nextTransaction;
-  nextTransactions.sort(sortTransactions);
-  await writeJsonFile(dataFiles.transactions, nextTransactions);
-
-  return nextTransaction;
+  return mapTransactionRow(data);
 }
 
 export async function deleteTransaction(id: string) {
-  const transactions = await listTransactions();
-  const nextTransactions = transactions.filter((transaction) => transaction.id !== id);
+  const supabase = createSupabaseServerClient();
+  const { error, count } = await supabase.from("transactions").delete({ count: "exact" }).eq("id", id);
 
-  if (nextTransactions.length === transactions.length) {
-    throw new Error("거래내역을 찾을 수 없습니다.");
+  if (error) {
+    throw new Error(`거래내역을 삭제하지 못했습니다: ${error.message}`);
   }
 
-  await writeJsonFile(dataFiles.transactions, nextTransactions);
+  if (!count) {
+    throw new Error("거래내역을 찾을 수 없습니다.");
+  }
 }
 
 export async function getDefaultMonth() {
-  const transactions = await listTransactions();
-  const latest = transactions[0];
+  const supabase = createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("transaction_date, created_at")
+    .order("transaction_date", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  if (latest && isMonthString(latest.transactionDate.slice(0, 7))) {
-    return latest.transactionDate.slice(0, 7);
+  if (error) {
+    throw new Error(`기본 월 정보를 계산하지 못했습니다: ${error.message}`);
+  }
+
+  if (data && isMonthString(data.transaction_date.slice(0, 7))) {
+    return data.transaction_date.slice(0, 7);
   }
 
   return getCurrentMonth();

@@ -1,12 +1,14 @@
 import Link from "next/link";
 
 import { MonthFilterForm } from "@/components/common/month-filter-form";
+import { SupabaseConfigNotice } from "@/components/common/supabase-config-notice";
 import { BudgetAlertList } from "@/components/dashboard/budget-alert-list";
 import { DailyExpenseChart } from "@/components/dashboard/daily-expense-chart";
 import { ExpensePieChart } from "@/components/dashboard/expense-pie-chart";
 import { RecentTransactionList } from "@/components/dashboard/recent-transaction-list";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { getDashboardSummary, resolveMonth } from "@/lib/data/dashboard-service";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { formatCurrency } from "@/lib/utils/currency";
 import { formatMonthLabel } from "@/lib/utils/date";
 import { getSearchParamValue } from "@/lib/utils/search";
@@ -18,6 +20,10 @@ type PageProps = {
 };
 
 export default async function DashboardPage({ searchParams }: PageProps) {
+  if (!isSupabaseConfigured()) {
+    return <SupabaseConfigNotice title="Supabase 연결이 필요합니다" />;
+  }
+
   const month = await resolveMonth(getSearchParamValue(searchParams?.month));
   const summary = await getDashboardSummary(month);
 

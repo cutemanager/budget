@@ -40,3 +40,14 @@ export function formatDateLabel(dateString: string) {
     weekday: "short"
   }).format(date);
 }
+
+export function getMonthDateRange(month: string) {
+  const [year, monthValue] = month.split("-").map(Number);
+  const start = `${month}-01`;
+  const nextMonth = new Date(year, monthValue, 1);
+
+  return {
+    start,
+    endExclusive: formatDateValue(nextMonth)
+  };
+}

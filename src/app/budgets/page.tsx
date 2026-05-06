@@ -1,8 +1,10 @@
-import { MonthFilterForm } from "@/components/common/month-filter-form";
 import { BudgetManager, type BudgetItem } from "@/components/budgets/budget-manager";
+import { MonthFilterForm } from "@/components/common/month-filter-form";
+import { SupabaseConfigNotice } from "@/components/common/supabase-config-notice";
 import { listBudgets } from "@/lib/data/budgets-repository";
 import { getCategories } from "@/lib/data/categories-repository";
 import { getDashboardSummary, resolveMonth } from "@/lib/data/dashboard-service";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { formatMonthLabel } from "@/lib/utils/date";
 import { getSearchParamValue } from "@/lib/utils/search";
 
@@ -13,6 +15,10 @@ type PageProps = {
 };
 
 export default async function BudgetsPage({ searchParams }: PageProps) {
+  if (!isSupabaseConfigured()) {
+    return <SupabaseConfigNotice title="Supabase 연결이 필요합니다" />;
+  }
+
   const month = await resolveMonth(getSearchParamValue(searchParams?.month));
   const [expenseCategories, budgets, summary] = await Promise.all([
     getCategories("expense"),

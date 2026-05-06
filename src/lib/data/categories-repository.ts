@@ -1,12 +1,23 @@
-import { dataFiles, generateId, readJsonFile, writeJsonFile } from "@/lib/data/file-db";
+import { mapCategoryRow } from "@/lib/data/supabase-mappers";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { generateId } from "@/lib/utils/id";
 import type { Category, CategoryType } from "@/types/category";
 
-const fallback: Category[] = [];
-
 export async function getCategories(type?: CategoryType) {
-  const categories = await readJsonFile<Category[]>(dataFiles.categories, fallback);
+  const supabase = createSupabaseServerClient();
+  let query = supabase.from("categories").select("*").order("created_at", { ascending: true });
 
-  return type ? categories.filter((category) => category.type === type) : categories;
+  if (type) {
+    query = query.eq("type", type);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(`카테고리를 불러오지 못했습니다: ${error.message}`);
+  }
+
+  return (data ?? []).map(mapCategoryRow);
 }
 
 export async function getCategoryMap() {
@@ -15,11 +26,20 @@ export async function getCategoryMap() {
 }
 
 export async function createCategory(input: Pick<Category, "name" | "type" | "color">) {
-  const categories = await getCategories();
-  const normalizedName = input.name.trim().toLowerCase();
-  const duplicate = categories.find(
-    (category) => category.type === input.type && category.name.trim().toLowerCase() === normalizedName
-  );
+  const supabase = createSupabaseServerClient();
+  const trimmedName = input.name.trim();
+
+  const { data: duplicate, error: duplicateError } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("type", input.type)
+    .ilike("name", trimmedName)
+    .limit(1)
+    .maybeSingle();
+
+  if (duplicateError) {
+    throw new Error(`카테고리 중복 여부를 확인하지 못했습니다: ${duplicateError.message}`);
+  }
 
   if (duplicate) {
     throw new Error("같은 이름의 카테고리가 이미 있습니다.");
@@ -27,14 +47,27 @@ export async function createCategory(input: Pick<Category, "name" | "type" | "co
 
   const nextCategory: Category = {
     id: generateId("cat"),
-    name: input.name.trim(),
+    name: trimmedName,
     type: input.type,
     color: input.color,
     createdAt: new Date().toISOString()
   };
 
-  const nextCategories = [...categories, nextCategory];
-  await writeJsonFile(dataFiles.categories, nextCategories);
+  const { data, error } = await supabase
+    .from("categories")
+    .insert({
+      id: nextCategory.id,
+      name: nextCategory.name,
+      type: nextCategory.type,
+      color: nextCategory.color,
+      created_at: nextCategory.createdAt
+    })
+    .select("*")
+    .single();
 
-  return nextCategory;
+  if (error) {
+    throw new Error(`카테고리를 저장하지 못했습니다: ${error.message}`);
+  }
+
+  return mapCategoryRow(data);
 }

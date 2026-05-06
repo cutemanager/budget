@@ -1,8 +1,10 @@
-import { HistoryManager } from "@/components/history/history-manager";
 import { MonthFilterForm } from "@/components/common/month-filter-form";
+import { SupabaseConfigNotice } from "@/components/common/supabase-config-notice";
+import { HistoryManager } from "@/components/history/history-manager";
 import { getCategories } from "@/lib/data/categories-repository";
 import { resolveMonth } from "@/lib/data/dashboard-service";
 import { listEnrichedTransactions } from "@/lib/data/transactions-repository";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { formatMonthLabel } from "@/lib/utils/date";
 import { getSearchParamValue } from "@/lib/utils/search";
 import type { CategoryType } from "@/types/category";
@@ -14,6 +16,10 @@ type PageProps = {
 };
 
 export default async function HistoryPage({ searchParams }: PageProps) {
+  if (!isSupabaseConfigured()) {
+    return <SupabaseConfigNotice title="Supabase 연결이 필요합니다" />;
+  }
+
   const month = await resolveMonth(getSearchParamValue(searchParams?.month));
   const q = getSearchParamValue(searchParams?.q)?.trim();
   const typeValue = getSearchParamValue(searchParams?.type);
