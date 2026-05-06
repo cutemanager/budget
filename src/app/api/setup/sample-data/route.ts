@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { revalidateBudgetBookPages } from "@/lib/data/revalidate-budget-book-pages";
 import { seedSampleData } from "@/lib/data/sample-data-service";
 
 export const dynamic = "force-dynamic";
@@ -7,6 +8,7 @@ export const dynamic = "force-dynamic";
 export async function POST() {
   try {
     const result = await seedSampleData();
+    revalidateBudgetBookPages();
 
     return NextResponse.json({
       message: `${result.month} 기준 샘플 데이터를 반영했습니다.`,

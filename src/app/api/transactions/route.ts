@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getCategoryMap } from "@/lib/data/categories-repository";
+import { revalidateBudgetBookPages } from "@/lib/data/revalidate-budget-book-pages";
 import { createTransaction, listEnrichedTransactions } from "@/lib/data/transactions-repository";
 import { transactionSchema } from "@/lib/utils/validators";
 
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
     }
 
     const transaction = await createTransaction(parsed);
+    revalidateBudgetBookPages();
     return NextResponse.json(transaction, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : "거래 내역을 저장하지 못했습니다.";

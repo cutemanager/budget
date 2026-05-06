@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { listBudgets, saveBudget } from "@/lib/data/budgets-repository";
+import { revalidateBudgetBookPages } from "@/lib/data/revalidate-budget-book-pages";
 import { budgetBatchSchema } from "@/lib/utils/validators";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
       });
     }
 
+    revalidateBudgetBookPages();
     const budgets = await listBudgets(parsed.month);
     return NextResponse.json(budgets);
   } catch (error) {

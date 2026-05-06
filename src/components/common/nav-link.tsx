@@ -19,6 +19,7 @@ export function NavLink({ href, children }: NavLinkProps) {
         isActive ? "bg-ink text-paper" : "bg-white/70 text-ink hover:bg-white"
       }`}
       href={href}
+      prefetch={false}
     >
       {children}
     </Link>

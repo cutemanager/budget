@@ -32,20 +32,16 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     <div className="space-y-5">
       <MonthFilterForm
         action="/"
-        description="월별 수입, 지출, 예산 경고를 한 화면에서 빠르게 확인할 수 있습니다."
+        description="월별 수입, 지출, 예산 경고를 대시보드에서 빠르게 확인할 수 있습니다."
         month={month}
         title={formatMonthLabel(month)}
       />
 
-      <SummaryCards
-        balance={summary.balance}
-        totalExpense={summary.totalExpense}
-        totalIncome={summary.totalIncome}
-      />
+      <SummaryCards balance={summary.balance} totalExpense={summary.totalExpense} totalIncome={summary.totalIncome} />
 
       {summary.recentTransactions.length === 0 ? (
         <SampleDataSeeder
-          description="대시보드가 비어 있다면 기본 카테고리와 이번 달 샘플 거래/예산을 한 번에 채워 바로 테스트할 수 있습니다."
+          description="대시보드가 비어 있다면 기본 카테고리와 이번 달 샘플 거래, 예산 데이터를 한 번에 넣어 바로 테스트할 수 있습니다."
           title="처음 테스트하신다면"
         />
       ) : null}
@@ -97,18 +93,21 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             <Link
               className="rounded-3xl bg-ink px-4 py-4 text-sm font-semibold text-paper transition hover:bg-clay"
               href="/quick-entry"
+              prefetch={false}
             >
               거래 내역 빠르게 입력하기
             </Link>
             <Link
               className="rounded-3xl border border-black/10 bg-white px-4 py-4 text-sm font-semibold text-ink transition hover:border-accent"
               href={`/history?month=${month}`}
+              prefetch={false}
             >
               {formatMonthLabel(month)} 내역 조회하기
             </Link>
             <Link
               className="rounded-3xl border border-black/10 bg-white px-4 py-4 text-sm font-semibold text-ink transition hover:border-accent"
               href={`/budgets?month=${month}`}
+              prefetch={false}
             >
               예산 관리하기
             </Link>

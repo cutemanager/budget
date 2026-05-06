@@ -10,12 +10,12 @@ export function RecentTransactionList({ transactions }: RecentTransactionListPro
   return (
     <section className="rounded-4xl border border-white/70 bg-white/80 p-5 shadow-soft">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-ink">최근 거래내역</h3>
-        <span className="text-sm text-ink/50">{transactions.length}개</span>
+        <h3 className="text-lg font-bold text-ink">최근 거래 내역</h3>
+        <span className="text-sm text-ink/50">{transactions.length}건</span>
       </div>
 
       {transactions.length === 0 ? (
-        <p className="mt-4 text-sm text-ink/60">최근 거래내역이 없습니다.</p>
+        <p className="mt-4 text-sm text-ink/60">최근 거래 내역이 없습니다.</p>
       ) : (
         <div className="mt-4 space-y-3">
           {transactions.map((transaction) => (
@@ -23,10 +23,7 @@ export function RecentTransactionList({ transactions }: RecentTransactionListPro
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span
-                      className="h-3 w-3 rounded-full"
-                      style={{ backgroundColor: transaction.categoryColor }}
-                    />
+                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: transaction.categoryColor }} />
                     <span className="font-semibold text-ink">{transaction.categoryName}</span>
                     <span className="text-xs text-ink/50">{formatDateLabel(transaction.transactionDate)}</span>
                   </div>
