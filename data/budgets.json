@@ -1,0 +1,44 @@
+[
+  {
+    "id": "budget-2026-04-total",
+    "month": "2026-04",
+    "categoryId": null,
+    "amount": 1500000,
+    "createdAt": "2026-04-01T00:00:00.000Z"
+  },
+  {
+    "id": "budget-2026-04-food",
+    "month": "2026-04",
+    "categoryId": "cat-exp-food",
+    "amount": 400000,
+    "createdAt": "2026-04-01T00:00:00.000Z"
+  },
+  {
+    "id": "budget-2026-04-transport",
+    "month": "2026-04",
+    "categoryId": "cat-exp-transport",
+    "amount": 80000,
+    "createdAt": "2026-04-01T00:00:00.000Z"
+  },
+  {
+    "id": "budget-2026-04-shopping",
+    "month": "2026-04",
+    "categoryId": "cat-exp-shopping",
+    "amount": 150000,
+    "createdAt": "2026-04-01T00:00:00.000Z"
+  },
+  {
+    "id": "budget-2026-04-cafe",
+    "month": "2026-04",
+    "categoryId": "cat-exp-cafe",
+    "amount": 70000,
+    "createdAt": "2026-04-01T00:00:00.000Z"
+  },
+  {
+    "id": "budget-2026-04-hobby",
+    "month": "2026-04",
+    "categoryId": "cat-exp-hobby",
+    "amount": 60000,
+    "createdAt": "2026-04-01T00:00:00.000Z"
+  }
+]

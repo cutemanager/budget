@@ -1,0 +1,10 @@
+.next
+node_modules
+*.log
+dist
+coverage
+out
+tools
+node.exe
+server.out.log
+server.err.log

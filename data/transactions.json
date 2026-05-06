@@ -1,0 +1,122 @@
+[
+  {
+    "id": "txn-001",
+    "type": "expense",
+    "amount": 12000,
+    "categoryId": "cat-exp-food",
+    "paymentMethod": "card",
+    "memo": "점심",
+    "transactionDate": "2026-04-02",
+    "createdAt": "2026-04-02T03:00:00.000Z"
+  },
+  {
+    "id": "txn-002",
+    "type": "expense",
+    "amount": 47000,
+    "categoryId": "cat-exp-transport",
+    "paymentMethod": "card",
+    "memo": "교통카드 충전",
+    "transactionDate": "2026-04-03",
+    "createdAt": "2026-04-03T03:00:00.000Z"
+  },
+  {
+    "id": "txn-003",
+    "type": "expense",
+    "amount": 6500,
+    "categoryId": "cat-exp-cafe",
+    "paymentMethod": "card",
+    "memo": "아메리카노",
+    "transactionDate": "2026-04-04",
+    "createdAt": "2026-04-04T02:30:00.000Z"
+  },
+  {
+    "id": "txn-004",
+    "type": "income",
+    "amount": 3200000,
+    "categoryId": "cat-inc-salary",
+    "paymentMethod": "bank",
+    "memo": "급여",
+    "transactionDate": "2026-04-05",
+    "createdAt": "2026-04-05T01:00:00.000Z"
+  },
+  {
+    "id": "txn-005",
+    "type": "expense",
+    "amount": 38000,
+    "categoryId": "cat-exp-food",
+    "paymentMethod": "card",
+    "memo": "장보기",
+    "transactionDate": "2026-04-06",
+    "createdAt": "2026-04-06T05:10:00.000Z"
+  },
+  {
+    "id": "txn-006",
+    "type": "expense",
+    "amount": 89000,
+    "categoryId": "cat-exp-shopping",
+    "paymentMethod": "card",
+    "memo": "생필품",
+    "transactionDate": "2026-04-08",
+    "createdAt": "2026-04-08T11:10:00.000Z"
+  },
+  {
+    "id": "txn-007",
+    "type": "expense",
+    "amount": 650000,
+    "categoryId": "cat-exp-home",
+    "paymentMethod": "bank",
+    "memo": "월세",
+    "transactionDate": "2026-04-01",
+    "createdAt": "2026-04-01T02:00:00.000Z"
+  },
+  {
+    "id": "txn-008",
+    "type": "expense",
+    "amount": 74000,
+    "categoryId": "cat-exp-bills",
+    "paymentMethod": "bank",
+    "memo": "전기/가스",
+    "transactionDate": "2026-04-10",
+    "createdAt": "2026-04-10T02:00:00.000Z"
+  },
+  {
+    "id": "txn-009",
+    "type": "expense",
+    "amount": 55000,
+    "categoryId": "cat-exp-phone",
+    "paymentMethod": "bank",
+    "memo": "휴대폰 요금",
+    "transactionDate": "2026-04-11",
+    "createdAt": "2026-04-11T02:00:00.000Z"
+  },
+  {
+    "id": "txn-010",
+    "type": "expense",
+    "amount": 42000,
+    "categoryId": "cat-exp-hobby",
+    "paymentMethod": "card",
+    "memo": "책 구매",
+    "transactionDate": "2026-04-13",
+    "createdAt": "2026-04-13T08:00:00.000Z"
+  },
+  {
+    "id": "txn-011",
+    "type": "income",
+    "amount": 180000,
+    "categoryId": "cat-inc-side",
+    "paymentMethod": "bank",
+    "memo": "프리랜서 작업",
+    "transactionDate": "2026-04-15",
+    "createdAt": "2026-04-15T07:30:00.000Z"
+  },
+  {
+    "id": "txn-012",
+    "type": "expense",
+    "amount": 30000,
+    "categoryId": "cat-exp-health",
+    "paymentMethod": "card",
+    "memo": "약국",
+    "transactionDate": "2026-04-18",
+    "createdAt": "2026-04-18T09:40:00.000Z"
+  }
+]
